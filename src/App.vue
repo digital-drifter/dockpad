@@ -27,8 +27,11 @@
         <v-content>
             <v-container fill-height fluid grid-list-lg>
                 <v-layout row wrap>
-                    <v-flex shrink>
+                    <v-flex xs12 sm6 md4 shrink>
                         <bitbucket></bitbucket>
+                    </v-flex>
+                    <v-flex xs12 sm6 md4 shrink>
+                        <docker></docker>
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -42,10 +45,12 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator'
   import Bitbucket from './components/Bitbucket.vue'
+  import Docker from './components/Docker.vue'
 
   @Component({
     components: {
-      Bitbucket
+      Bitbucket,
+      Docker
     }
   })
   export default class App extends Vue {

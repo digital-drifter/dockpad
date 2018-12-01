@@ -1,0 +1,103 @@
+{
+  "images": [
+    "php:7.2.12",
+    "php:7.2.12-stretch",
+    "php:7.2.12-fpm",
+    "php:7.2.12-cli"
+  ],
+  "modules": [
+    "dba",
+    "ipv6",
+    "dom",
+    "calendar",
+    "wddx",
+    "static",
+    "inifile",
+    "inline",
+    "cli",
+    "ftp",
+    "filter",
+    "gcov",
+    "zts",
+    "json",
+    "hash",
+    "exif",
+    "mbstring",
+    "mbregex",
+    "libgcc",
+    "pdo",
+    "posix",
+    "embed",
+    "sockets",
+    "debug",
+    "phpdbg",
+    "zip",
+    "bcmath",
+    "fileinfo",
+    "ctype",
+    "cgi",
+    "soap",
+    "pcntl",
+    "phar",
+    "session",
+    "tokenizer",
+    "opcache",
+    "imap",
+    "tidy",
+    "kerberos",
+    "xmlrpc",
+    "fpm",
+    "dtrace",
+    "pcre",
+    "mhash",
+    "mcrypt",
+    "zlib",
+    "curl",
+    "readline",
+    "editline",
+    "gd",
+    "intl",
+    "icu",
+    "openssl",
+    "mysql",
+    "sqlite",
+    "pgsql",
+    "xml",
+    "xml_all",
+    "gettext",
+    "iconv",
+    "bz2",
+    "ipc",
+    "gmp"
+  ],
+  "databases": [
+    "mysql",
+    "mariadb",
+    "postgres",
+    "sqlite"
+  ],
+  "caches": [
+    "redis",
+    "memcached"
+  ],
+  "dependencies": {
+    "composer": [
+      "hirak/prestissimo",
+      "barryvdh/ide-helper",
+      "laravel/telescope",
+      "laravel/passport",
+      "laravel/socialite",
+      "laravel/scout",
+      "laravel/horizon"
+    ],
+    "node": [
+      "@vue/cli",
+      "typescript"
+    ]
+  },
+  "webservers": [
+    "nginx",
+    "apache",
+    "caddy"
+  ]
+}

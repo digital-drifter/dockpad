@@ -17,3 +17,15 @@ export interface IBitbucketOauth {
   scopes: string
   token_type: string
 }
+
+export interface IDocker {
+  images: string[]
+  modules: string[]
+  databases: string[]
+  caches: string[]
+  dependencies: {
+    composer: string[]
+    node: string[]
+  }
+  webservers: string[]
+}

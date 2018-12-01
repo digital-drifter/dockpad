@@ -3,7 +3,7 @@
         <v-toolbar card>
             <v-toolbar-title class="title">Bitbucket</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn :disabled="$bitbucket.authenticated" @click="authenticate" class="blue" raised>Sign In</v-btn>
+            <v-btn @click="authenticate" class="blue" raised>{{ $bitbucket.authenticated ? 'Refresh Token' : 'Sign In' }}</v-btn>
         </v-toolbar>
         <v-card-text>
             <v-flex xs12>
@@ -15,7 +15,7 @@
                                 return-object
                                 v-model="$bitbucket.team">
                     <v-slide-x-reverse-transition mode="out-in" slot="append-outer">
-                        <v-icon @click="$bitbucket.getTeams()">refresh</v-icon>
+                        <v-icon @click="$bitbucket.getTeams">refresh</v-icon>
                     </v-slide-x-reverse-transition>
                 </v-autocomplete>
             </v-flex>
@@ -30,7 +30,7 @@
                                 :search-input.sync="repositories.search"
                                 v-model="$bitbucket.repository">
                     <v-slide-x-reverse-transition mode="out-in" slot="append-outer">
-                        <v-icon @click="$bitbucket.getRepositories()">refresh</v-icon>
+                        <v-icon @click="$bitbucket.getRepositories">refresh</v-icon>
                     </v-slide-x-reverse-transition>
                 </v-autocomplete>
             </v-flex>
@@ -45,7 +45,7 @@
                                 :search-input.sync="branches.search"
                                 v-model="$bitbucket.branch">
                     <v-slide-x-reverse-transition mode="out-in" slot="append-outer">
-                        <v-icon @click="$bitbucket.getBranches()">refresh</v-icon>
+                        <v-icon @click="$bitbucket.getBranches">refresh</v-icon>
                     </v-slide-x-reverse-transition>
                 </v-autocomplete>
             </v-flex>
