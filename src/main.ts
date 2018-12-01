@@ -2,6 +2,7 @@ import Vue, { CreateElement } from 'vue'
 import './plugins/vuetify'
 import Bitbucket from './plugins/bitbucket'
 import App from './App.vue'
+import router from './router'
 import './registerServiceWorker'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
@@ -13,5 +14,6 @@ Vue.use(Bitbucket, {
 })
 
 new Vue({
-  render: (h: CreateElement) => h(App)
+  render: (h: CreateElement) => h(App),
+  router
 }).$mount('#app')

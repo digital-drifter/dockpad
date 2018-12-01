@@ -25,10 +25,10 @@
             <v-toolbar-title>Dockpad</v-toolbar-title>
         </v-toolbar>
         <v-content>
-            <v-container fill-height fluid>
-                <v-layout align-center justify-center>
+            <v-container fill-height fluid grid-list-lg>
+                <v-layout row wrap>
                     <v-flex shrink>
-
+                        <bitbucket></bitbucket>
                     </v-flex>
                 </v-layout>
             </v-container>
@@ -41,21 +41,16 @@
 
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator'
+  import Bitbucket from './components/Bitbucket.vue'
 
-  @Component
+  @Component({
+    components: {
+      Bitbucket
+    }
+  })
   export default class App extends Vue {
     public name: string = 'App'
 
     private drawer: boolean = true
-
-    public mounted (): void {
-      this.$bitbucket.authenticate().catch((error: any) => {
-        console.log(error)
-      })
-    }
-
-    private createPopupWindow (): any {
-
-    }
   }
 </script>
