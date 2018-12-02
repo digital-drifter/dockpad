@@ -6,5 +6,6 @@ declare module 'vue/types/vue' {
     $bitbucket: IBitbucket
     $docker: IDocker
     $emitter: Vue
+    $http: any
   }
 }

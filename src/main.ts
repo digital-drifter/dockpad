@@ -3,6 +3,7 @@ import './plugins/vuetify'
 import Bitbucket from './plugins/bitbucket'
 import Docker from './plugins/docker'
 import Emitter from './plugins/emitter'
+import Http from './plugins/http'
 import App from './App.vue'
 import router from './router'
 import './registerServiceWorker'
@@ -19,6 +20,11 @@ Vue.use(Bitbucket, {
 Vue.use(Docker, DockerOptions)
 
 Vue.use(Emitter)
+
+Vue.use(Http, {
+  host: process.env.VUE_APP_PROXY_HOST,
+  port: process.env.VUE_APP_PROXY_PORT
+})
 
 const app = new Vue({
   render: (h: CreateElement) => h(App),
