@@ -1,13 +1,20 @@
 export interface IBitbucket {
   repositories: any[]
-  repository: any
   authenticated: boolean
   teams: any[]
   user: any
-  team: any
+
   authenticate (): Promise<any>
-  getUser(): Promise<any>
-  getRepositories(search?: string): Promise<any>
+
+  refresh (): Promise<any>
+
+  getUser (): Promise<any>
+
+  getTeams (): Promise<any>
+
+  getRepositories (team: any, search?: string): Promise<any>
+
+  getBranches (team: any, repository: any): Promise<any>
 }
 
 export interface IBitbucketOauth {

@@ -3,49 +3,61 @@
         <v-toolbar card>
             <v-toolbar-title class="title">Bitbucket</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn @click="authenticate" class="blue" raised>{{ $bitbucket.authenticated ? 'Refresh Token' : 'Sign In' }}</v-btn>
+            <v-btn v-if="!authenticated" @click="$bitbucket.authenticate()" class="blue" raised>Sign In</v-btn>
+            <v-btn v-else @click="$bitbucket.refresh()" class="blue" raised>Refresh Token</v-btn>
         </v-toolbar>
         <v-card-text>
             <v-flex xs12>
-                <v-autocomplete :items="$bitbucket.teams"
-                                label="Teams"
-                                prepend-icon="group"
+                <v-autocomplete :disabled="!authenticated"
+                                :items="$bitbucket.teams"
                                 item-text="display_name"
                                 item-value="uuid"
+                                label="Teams"
+                                prepend-icon="group"
                                 return-object
-                                v-model="$bitbucket.team">
+                                outline
+                                clearable
+                                v-model="teams.selected">
                     <v-slide-x-reverse-transition mode="out-in" slot="append-outer">
-                        <v-icon @click="$bitbucket.getTeams">refresh</v-icon>
+                        <v-icon @click="$bitbucket.getTeams()">refresh</v-icon>
                     </v-slide-x-reverse-transition>
                 </v-autocomplete>
             </v-flex>
             <v-flex xs12>
-                <v-autocomplete :items="$bitbucket.repositories"
-                                label="Repositories"
-                                prepend-icon="code"
-                                item-text="name"
-                                item-value="uuid"
-                                return-object
+                <v-autocomplete :disabled="!teams.selected"
+                                :items="$bitbucket.repositories"
                                 :loading="repositories.loading"
                                 :search-input.sync="repositories.search"
-                                v-model="$bitbucket.repository">
+                                item-text="name"
+                                item-value="uuid"
+                                label="Repositories"
+                                prepend-icon="code"
+                                return-object
+                                no-filter
+                                outline
+                                clearable
+                                v-model="repositories.selected">
                     <v-slide-x-reverse-transition mode="out-in" slot="append-outer">
-                        <v-icon @click="$bitbucket.getRepositories">refresh</v-icon>
+                        <v-icon @click="$bitbucket.getRepositories(teams.selected)">refresh</v-icon>
                     </v-slide-x-reverse-transition>
                 </v-autocomplete>
             </v-flex>
             <v-flex xs12>
-                <v-autocomplete :items="$bitbucket.branches"
-                                label="Branches"
-                                prepend-icon="code"
-                                item-text="name"
-                                item-value="uuid"
-                                return-object
+                <v-autocomplete :disabled="!repositories.selected"
+                                :items="$bitbucket.branches"
                                 :loading="branches.loading"
                                 :search-input.sync="branches.search"
-                                v-model="$bitbucket.branch">
+                                item-text="name"
+                                item-value="uuid"
+                                label="Branches"
+                                prepend-icon="code"
+                                return-object
+                                no-filter
+                                outline
+                                clearable
+                                v-model="branches.selected">
                     <v-slide-x-reverse-transition mode="out-in" slot="append-outer">
-                        <v-icon @click="$bitbucket.getBranches">refresh</v-icon>
+                        <v-icon @click="$bitbucket.getBranches(teams.selected, repositories.selected)">refresh</v-icon>
                     </v-slide-x-reverse-transition>
                 </v-autocomplete>
             </v-flex>
@@ -61,41 +73,43 @@
 
   @Component
   export default class Bitbucket extends Vue {
+    private teams: any = {
+      selected: null,
+      loading: false,
+      search: ''
+    }
+
     private repositories: any = {
+      selected: null,
       loading: false,
       search: ''
     }
 
     private branches: any = {
+      selected: null,
       loading: false,
       search: ''
     }
 
-    public mounted (): void {
-      if (this.$bitbucket.authenticated) {
-        this.$bitbucket.getUser()
-          .catch((error: any) => {
-            console.log(error)
-          })
-      }
+    authenticated: boolean = false
+
+    created (): void {
+      this.$emitter.$on('authenticated', (authenticated: boolean) => {
+        this.authenticated = authenticated
+      })
     }
 
-    private authenticate (): void {
-      this.$bitbucket.authenticate()
-        .then(async () => {
-          await this.$bitbucket.getUser()
-        })
-        .catch((error: any) => {
-          console.log(error)
-        })
+    @Watch('$bitbucket.oauth', { deep: true, immediate: true })
+    onBitbucketChanged (value: any): void {
+      console.log(value)
     }
 
     @Watch('repositories.search')
     onRepositoriesSearchChanged (value: string): void {
-      if (!this.repositories.loading) {
+      if (this.authenticated && this.teams.selected && !this.repositories.loading) {
         this.repositories.loading = true
 
-        this.$bitbucket.getRepositories(value)
+        this.$bitbucket.getRepositories(this.teams.selected, value)
           .catch((error: any) => {
             console.log(error)
           })

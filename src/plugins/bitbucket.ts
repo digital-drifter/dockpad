@@ -1,17 +1,25 @@
 import Vue, { VueConstructor } from 'vue'
-import qs from 'qs'
 import { IBitbucket, IBitbucketOauth } from '@/dockpad'
+import { emitter } from '@/plugins/emitter'
 
 class Bitbucket implements IBitbucket {
-  private readonly key: string = ''
-  private readonly secret: string = ''
   private readonly baseUrl: string = 'https://bitbucket.org'
   private readonly apiBaseUrl: string = 'https://api.bitbucket.org'
   private readonly version: string = '2.0'
 
+  private state: Map<string, any> = new Map()
+
   constructor (options: { [p: string]: any }) {
-    this.key = options.key
-    this.secret = options.secret
+    this.state.set('bitbucket_oauth_key', options.key)
+    this.state.set('bitbucket_oauth_secret', options.secret)
+
+    const teams = localStorage.getItem('bitbucket_teams')
+    const repositories = localStorage.getItem('bitbucket_repositories')
+    const branches = localStorage.getItem('bitbucket_branches')
+
+    this.state.set('bitbucket_teams', teams ? JSON.parse(teams) : [])
+    this.state.set('bitbucket_repositories', repositories ? JSON.parse(repositories) : [])
+    this.state.set('bitbucket_branches', branches ? JSON.parse(branches) : [])
   }
 
   public get authenticated (): boolean {
@@ -23,51 +31,19 @@ class Bitbucket implements IBitbucket {
   }
 
   public get repositories (): any[] {
-    try {
-      return JSON.parse(localStorage.getItem('bitbucket_repositories') as string)
-    } catch (e) {
-      return []
-    }
+    return this.state.get('bitbucket_repositories')
   }
 
-  public set repositories (value: any[]) {
-    localStorage.setItem('bitbucket_repositories', JSON.stringify(value))
+  public set repositories (repositories: any[]) {
+    this.state.set('bitbucket_repositories', repositories)
   }
 
   public get branches (): any[] {
-    try {
-      return JSON.parse(localStorage.getItem('bitbucket_branches') as string)
-    } catch (e) {
-      return []
-    }
+    return this.state.get('bitbucket_branches')
   }
 
-  public set branches (value: any[]) {
-    localStorage.setItem('bitbucket_branches', JSON.stringify(value))
-  }
-
-  public get branch (): any {
-    try {
-      return JSON.parse(localStorage.getItem('bitbucket_branch') as string)
-    } catch (e) {
-      return {} as any
-    }
-  }
-
-  public set branch (value: any) {
-    localStorage.setItem('bitbucket_branch', JSON.stringify(value))
-  }
-
-  public get repository (): any {
-    try {
-      return JSON.parse(localStorage.getItem('bitbucket_repository') as string)
-    } catch (e) {
-      return {}
-    }
-  }
-
-  public set repository (value: any) {
-    localStorage.setItem('bitbucket_repository', JSON.stringify(value))
+  public set branches (branches: any[]) {
+    this.state.set('bitbucket_branches', branches)
   }
 
   public get user (): any {
@@ -78,24 +54,12 @@ class Bitbucket implements IBitbucket {
     localStorage.setItem('bitbucket_user', JSON.stringify(value))
   }
 
-  public get team (): any {
-    return JSON.parse(localStorage.getItem('bitbucket_team') as string)
-  }
-
-  public set team (value: any) {
-    localStorage.setItem('bitbucket_team', JSON.stringify(value))
-  }
-
   public get teams (): any[] {
-    try {
-      return JSON.parse(localStorage.getItem('bitbucket_teams') as string)
-    } catch (e) {
-      return []
-    }
+    return this.state.get('bitbucket_teams')
   }
 
-  public set teams (value: any[]) {
-    localStorage.setItem('bitbucket_teams', JSON.stringify(value))
+  public set teams (teams: any[]) {
+    this.state.set('bitbucket_teams', teams)
   }
 
   private get oauth (): IBitbucketOauth {
@@ -119,7 +83,7 @@ class Bitbucket implements IBitbucket {
   }
 
   private get basicAuth (): string {
-    return 'Basic ' + Buffer.from(`${ this.key }:${ this.secret }`).toString('base64')
+    return 'Basic ' + Buffer.from(`${ this.state.get('bitbucket_oauth_key') }:${ this.state.get('bitbucket_oauth_secret') }`).toString('base64')
   }
 
   public authenticate (): Promise<any> {
@@ -132,7 +96,7 @@ class Bitbucket implements IBitbucket {
 
         const headers = new Headers()
 
-        headers.set('Authorization', 'Basic ' + Buffer.from(`${ this.key }:${ this.secret }`).toString('base64'))
+        headers.set('Authorization', this.basicAuth)
 
         return fetch(`${ this.baseUrl }/site/oauth2/access_token`, {
           method: 'post',
@@ -145,13 +109,19 @@ class Bitbucket implements IBitbucket {
           .then((obj: IBitbucketOauth) => {
             this.oauth = obj
           })
+          .then(() => {
+            return this.getUser()
+          })
           .catch((error: any) => {
             console.error(error)
+          })
+          .finally(() => {
+            emitter.$emit('authenticated', this.authenticated)
           })
       }
     })
 
-    return this.popup(`${ this.baseUrl }/site/oauth2/authorize?client_id=${ this.key }&response_type=code`)
+    return this.popup(`${ this.baseUrl }/site/oauth2/authorize?client_id=${ this.state.get('bitbucket_oauth_key') }&response_type=code`)
   }
 
   public getUser (): Promise<any> {
@@ -162,6 +132,8 @@ class Bitbucket implements IBitbucket {
         if (response.ok) {
           return response.json()
         }
+
+        return Promise.reject(response.statusText)
       })
       .then((data: any) => {
         this.user = data
@@ -182,8 +154,8 @@ class Bitbucket implements IBitbucket {
       })
   }
 
-  public getRepositories (search?: string): Promise<any> {
-    let url: string = `${ this.apiBaseUrl }/${ this.version }/repositories/${this.team.uuid}`
+  public getRepositories (team: any, search?: string): Promise<any> {
+    let url: string = `${ this.apiBaseUrl }/${ this.version }/repositories/${team.uuid}`
     if (search) {
       url += `?q=name${encodeURIComponent('~"' + search + '"')}`
     }
@@ -200,8 +172,8 @@ class Bitbucket implements IBitbucket {
       })
   }
 
-  public getBranches (): Promise<any> {
-    return fetch(`${ this.apiBaseUrl }/${ this.version }/repositories/${this.team.uuid}/${this.repository.uuid}/refs/branches`, {
+  public getBranches (team: any, repository: any): Promise<any> {
+    return fetch(`${ this.apiBaseUrl }/${ this.version }/repositories/${team.uuid}/${repository.uuid}/refs/branches`, {
       headers: this.headers
     })
       .then((response: Response) => {
@@ -214,20 +186,23 @@ class Bitbucket implements IBitbucket {
       })
   }
 
-  private refresh (): Promise<any> {
+  public refresh (): Promise<any> {
     const formData = new FormData()
+    const headers = new Headers()
 
     formData.append('grant_type', 'refresh_token')
     formData.append('refresh_token', this.oauth.refresh_token)
 
+    headers.set('Authorization', this.basicAuth)
+
     return fetch(`${ this.baseUrl }/site/oauth2/access_token`, {
       method: 'post',
       body: formData,
-      headers: this.headers
+      headers
     })
       .then((response: Response) => response.json())
-      .then((data: any) => {
-        console.log(data)
+      .then((data: IBitbucketOauth) => {
+        this.oauth = data
       })
   }
 
@@ -275,7 +250,5 @@ class Bitbucket implements IBitbucket {
 }
 
 export default (vm: VueConstructor<Vue>, options: any) => {
-  Object.defineProperty(vm.prototype, '$bitbucket', {
-    value: new Bitbucket(options)
-  })
+  Object.assign(vm.prototype, { $bitbucket: new Bitbucket(options) })
 }

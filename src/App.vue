@@ -10,12 +10,12 @@
                         <v-list-tile-title>Dashboard</v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
-                <v-list-tile @click="">
+                <v-list-tile :to="{ name: 'services' }">
                     <v-list-tile-action>
                         <v-icon>settings</v-icon>
                     </v-list-tile-action>
                     <v-list-tile-content>
-                        <v-list-tile-title>Settings</v-list-tile-title>
+                        <v-list-tile-title>Services</v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
             </v-list>
@@ -25,16 +25,23 @@
             <v-toolbar-title>Dockpad</v-toolbar-title>
         </v-toolbar>
         <v-content>
-            <v-container fill-height fluid grid-list-lg>
-                <v-layout row wrap>
-                    <v-flex xs12 sm6 md4 shrink>
-                        <bitbucket></bitbucket>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4 shrink>
-                        <docker></docker>
+            <v-container fluid fill-height>
+                <v-layout row>
+                    <v-flex xs12>
+                <router-view></router-view>
                     </v-flex>
                 </v-layout>
             </v-container>
+            <!--<v-container fill-height fluid grid-list-lg>-->
+                <!--<v-layout row wrap>-->
+                    <!--<v-flex xs12 sm6 md4 shrink>-->
+                        <!--<bitbucket></bitbucket>-->
+                    <!--</v-flex>-->
+                    <!--<v-flex xs12 sm6 md4 shrink>-->
+                        <!--<docker></docker>-->
+                    <!--</v-flex>-->
+                <!--</v-layout>-->
+            <!--</v-container>-->
         </v-content>
         <v-footer app fixed>
             <span>&copy; {{ (new Date()).getFullYear() }}</span>

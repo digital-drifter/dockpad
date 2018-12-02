@@ -2,6 +2,7 @@ import Vue, { CreateElement } from 'vue'
 import './plugins/vuetify'
 import Bitbucket from './plugins/bitbucket'
 import Docker from './plugins/docker'
+import Emitter from './plugins/emitter'
 import App from './App.vue'
 import router from './router'
 import './registerServiceWorker'
@@ -17,7 +18,9 @@ Vue.use(Bitbucket, {
 
 Vue.use(Docker, DockerOptions)
 
-new Vue({
+Vue.use(Emitter)
+
+const app = new Vue({
   render: (h: CreateElement) => h(App),
   router
 }).$mount('#app')

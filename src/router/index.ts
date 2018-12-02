@@ -12,6 +12,11 @@ const routes: RouteConfig[] = [
 
       next()
     }
+  },
+  {
+    name: 'services',
+    path: '/services',
+    component: () => import('../components/Services.vue')
   }
 ]
 
