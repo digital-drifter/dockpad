@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "cors-anywhere": "^0.4.1",
+    "debounce-async": "^0.0.2",
     "material-design-icons-iconfont": "^4.0.2",
     "qs": "^6.6.0",
     "register-service-worker": "^1.5.2",
