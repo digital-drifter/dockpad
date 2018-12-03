@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { IBitbucket, IDocker } from '@/dockpad'
+import { IBitbucket, IDocker, IWebSocketClient } from '@/dockpad'
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -7,5 +7,6 @@ declare module 'vue/types/vue' {
     $docker: IDocker
     $emitter: Vue
     $http: any
+    $ws: IWebSocketClient
   }
 }

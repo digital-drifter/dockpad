@@ -4,6 +4,7 @@ import Bitbucket from './plugins/bitbucket'
 import Docker from './plugins/docker'
 import Emitter from './plugins/emitter'
 import Http from './plugins/http'
+import WebSocketClient from './plugins/ws'
 import App from './App.vue'
 import router from './router'
 import './registerServiceWorker'
@@ -14,7 +15,8 @@ Vue.config.productionTip = false
 
 Vue.use(Bitbucket, {
   key: process.env.VUE_APP_BITBUCKET_OAUTH_KEY,
-  secret: process.env.VUE_APP_BITBUCKET_OAUTH_SECRET
+  secret: process.env.VUE_APP_BITBUCKET_OAUTH_SECRET,
+  dir: process.env.VUE_APP_REPO_DIR
 })
 
 Vue.use(Docker, DockerOptions)
@@ -30,6 +32,11 @@ Vue.use(Http, {
     host: process.env.VUE_APP_PROXY_HOST,
     port: process.env.VUE_APP_PROXY_PORT
   }
+})
+
+Vue.use(WebSocketClient, {
+  host: process.env.VUE_APP_WS_HOST,
+  port: process.env.VUE_APP_WS_PORT
 })
 
 const app = new Vue({

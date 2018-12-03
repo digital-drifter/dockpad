@@ -12,6 +12,7 @@ class Bitbucket implements IBitbucket {
   constructor (options: { [p: string]: any }) {
     this.state.set('bitbucket_oauth_key', options.key)
     this.state.set('bitbucket_oauth_secret', options.secret)
+    this.state.set('bitbucket_repo_dir', options.dir)
 
     const teams = localStorage.getItem('bitbucket_teams')
     const repositories = localStorage.getItem('bitbucket_repositories')
@@ -20,6 +21,10 @@ class Bitbucket implements IBitbucket {
     this.state.set('bitbucket_teams', teams ? JSON.parse(teams) : [])
     this.state.set('bitbucket_repositories', repositories ? JSON.parse(repositories) : [])
     this.state.set('bitbucket_branches', branches ? JSON.parse(branches) : [])
+  }
+
+  public get repoDir(): string {
+    return this.state.get('bitbucket_repo_dir')
   }
 
   public get authenticated (): boolean {
@@ -77,7 +82,7 @@ class Bitbucket implements IBitbucket {
   private set oauth (value: IBitbucketOauth) {
     const now = new Date()
     now.setHours(now.getHours() + 1)
-    localStorage.setItem('bitbucket_oauth', JSON.stringify(Object.assign(value, { expires_at: now } )))
+    localStorage.setItem('bitbucket_oauth', JSON.stringify(Object.assign(value, { expires_at: now })))
   }
 
   private get headers (): Headers {
@@ -165,15 +170,15 @@ class Bitbucket implements IBitbucket {
   }
 
   public getRepositories (team: any, page?: number, search?: string): Promise<any> {
-    let url: string = `${ this.apiBaseUrl }/${ this.version }/repositories/${team.uuid}`
-    let queryString = ''
+    let url: string = `${ this.apiBaseUrl }/${ this.version }/repositories/${ team.uuid }`
+    let params: string[] = []
     if (search) {
-      queryString = `q=name${encodeURIComponent('~"' + search + '"')}`
+      params.push(`q=name${ encodeURIComponent('~"' + search + '"') }`)
     }
     if (page) {
-      queryString = `page=${page}`
+      params.push(`page=${ page }`)
     }
-    return fetch([url, queryString].join('?'), {
+    return fetch([url, params.join('&')].join('?'), {
       headers: this.headers
     })
       .then((response: Response) => {
@@ -191,7 +196,7 @@ class Bitbucket implements IBitbucket {
   }
 
   public getBranches (team: any, repository: any): Promise<any> {
-    return fetch(`${ this.apiBaseUrl }/${ this.version }/repositories/${team.uuid}/${repository.uuid}/refs/branches`, {
+    return fetch(`${ this.apiBaseUrl }/${ this.version }/repositories/${ team.uuid }/${ repository.uuid }/refs/branches`, {
       headers: this.headers
     })
       .then((response: Response) => {

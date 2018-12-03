@@ -4,6 +4,7 @@ export interface IBitbucket {
   teams: any[]
   user: any
   accessToken: string
+  repoDir: string
 
   authenticate (): Promise<any>
 
@@ -38,4 +39,10 @@ export interface IDocker {
     node: string[]
   }
   webservers: string[]
+}
+
+export interface IWebSocketClient {
+  emit (event: string, payload: any): void
+
+  send (message: any, cb?: (data: any) => void): void
 }

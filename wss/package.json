@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "wss:start": "WSS_PORT=4444 node index.js",
+    "wss:stop": ""
+  },
+  "dependencies": {
+    "dockerode": "^2.5.7",
+    "shelljs": "^0.8.3",
+    "uuid": "^3.3.2",
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/socket.io": "^2.1.0"
+  }
+}
