@@ -17,6 +17,11 @@ const routes: RouteConfig[] = [
     name: 'services',
     path: '/services',
     component: () => import('../components/Services.vue')
+  },
+  {
+    name: 'bitbucket',
+    path: '/bitbucket',
+    component: () => import('../components/Bitbucket.vue')
   }
 ]
 

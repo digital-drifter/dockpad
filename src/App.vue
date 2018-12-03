@@ -1,7 +1,7 @@
 <template>
     <v-app dark id="inspire">
         <v-navigation-drawer app clipped fixed v-model="drawer">
-            <v-list dense>
+            <v-list dense avatar>
                 <v-list-tile @click="">
                     <v-list-tile-action>
                         <v-icon>dashboard</v-icon>
@@ -16,6 +16,18 @@
                     </v-list-tile-action>
                     <v-list-tile-content>
                         <v-list-tile-title>Services</v-list-tile-title>
+                    </v-list-tile-content>
+                </v-list-tile>
+                <v-list-tile :to="{ name: 'bitbucket' }">
+                    <v-list-tile-avatar size="22px" color="white">
+                        B
+                        <!--<v-avatar color="white">B</v-avatar>-->
+                    </v-list-tile-avatar>
+                    <!--<v-list-tile-action>-->
+                        <!--<v-icon>settings</v-icon>-->
+                    <!--</v-list-tile-action>-->
+                    <v-list-tile-content>
+                        <v-list-tile-title>Bitbucket</v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
             </v-list>

@@ -8,7 +8,11 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test:e2e": "vue-cli-service test:e2e",
-    "test:unit": "vue-cli-service test:unit"
+    "test:unit": "vue-cli-service test:unit",
+    "dnsmasq:start": "docker run -p 53:53/tcp -p 53:53/udp --cap-add=NET_ADMIN andyshinn/dnsmasq:2.75 -S /localhost/10.0.0.20",
+    "docker:start": "docker-compose -f docker/docker-compose.yml up -d",
+    "docker:stop": "docker-compose -f docker/docker-compose.yml down",
+    "server:start": "PORT=3333 node server/dist"
   },
   "dependencies": {
     "cors-anywhere": "^0.4.1",

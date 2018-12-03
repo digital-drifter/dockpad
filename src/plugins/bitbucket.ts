@@ -30,11 +30,11 @@ class Bitbucket implements IBitbucket {
     }
   }
 
-  public get repositories (): any[] {
+  public get repositories (): any {
     return this.state.get('bitbucket_repositories')
   }
 
-  public set repositories (repositories: any[]) {
+  public set repositories (repositories: any) {
     this.state.set('bitbucket_repositories', repositories)
   }
 
@@ -62,6 +62,10 @@ class Bitbucket implements IBitbucket {
     this.state.set('bitbucket_teams', teams)
   }
 
+  public get accessToken (): string {
+    return this.oauth.access_token
+  }
+
   private get oauth (): IBitbucketOauth {
     try {
       return JSON.parse(localStorage.getItem('bitbucket_oauth') || '')
@@ -71,7 +75,9 @@ class Bitbucket implements IBitbucket {
   }
 
   private set oauth (value: IBitbucketOauth) {
-    localStorage.setItem('bitbucket_oauth', JSON.stringify(value))
+    const now = new Date()
+    now.setHours(now.getHours() + 1)
+    localStorage.setItem('bitbucket_oauth', JSON.stringify(Object.assign(value, { expires_at: now } )))
   }
 
   private get headers (): Headers {
@@ -124,6 +130,10 @@ class Bitbucket implements IBitbucket {
     return this.popup(`${ this.baseUrl }/site/oauth2/authorize?client_id=${ this.state.get('bitbucket_oauth_key') }&response_type=code`)
   }
 
+  public clone (repository: any): void {
+
+  }
+
   public getUser (): Promise<any> {
     return fetch(`${ this.apiBaseUrl }/${ this.version }/user`, {
       headers: this.headers
@@ -154,12 +164,16 @@ class Bitbucket implements IBitbucket {
       })
   }
 
-  public getRepositories (team: any, search?: string): Promise<any> {
+  public getRepositories (team: any, page?: number, search?: string): Promise<any> {
     let url: string = `${ this.apiBaseUrl }/${ this.version }/repositories/${team.uuid}`
+    let queryString = ''
     if (search) {
-      url += `?q=name${encodeURIComponent('~"' + search + '"')}`
+      queryString = `q=name${encodeURIComponent('~"' + search + '"')}`
     }
-    return fetch(url, {
+    if (page) {
+      queryString = `page=${page}`
+    }
+    return fetch([url, queryString].join('?'), {
       headers: this.headers
     })
       .then((response: Response) => {
@@ -168,7 +182,11 @@ class Bitbucket implements IBitbucket {
         }
       })
       .then((data: any) => {
-        this.repositories = data.values
+        return {
+          page: data.page,
+          items: data.values,
+          size: data.size
+        }
       })
   }
 

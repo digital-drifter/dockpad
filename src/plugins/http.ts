@@ -3,7 +3,7 @@ import debounce from 'debounce-async'
 import md5 from '../utils'
 
 export default (vm: VueConstructor<Vue>, options: any) => {
-  const { host, port } = options
+  const { api, proxy } = options
 
   const createFormData = (obj: any) => {
     const formData = new FormData()
@@ -40,6 +40,25 @@ export default (vm: VueConstructor<Vue>, options: any) => {
             active = false
           }
 
+          let host: string
+          let port: string
+          let method: string
+
+          switch (true) {
+            case p.startsWith('api'):
+              host = api.host
+              port = api.port
+              method = p.slice(3).toLowerCase()
+              break
+            case p.startsWith('proxy'):
+              host = proxy.host
+              port = proxy.port
+              method = p.slice(5).toLowerCase()
+              break
+            default:
+              return Promise.reject(`Invalid request: ${p}`)
+          }
+
           const hash = md5(args[0])
 
           if (cache.has(hash)) {
@@ -47,14 +66,14 @@ export default (vm: VueConstructor<Vue>, options: any) => {
           }
 
           let params: any = {
-            method: p
+            method
           }
 
-          if (args.length > 1) {
+          if (args.length > 1 && args[1]) {
             Object.assign(params, { body: createFormData(args[1]) })
           }
 
-          if (args.length > 2) {
+          if (args.length > 2 && args[2]) {
             Object.assign(params, { headers: createHeaders(args[2]) })
           }
 
@@ -65,6 +84,10 @@ export default (vm: VueConstructor<Vue>, options: any) => {
           Object.assign(params, { signal: abortController.signal })
 
           const url: string = `http://${ host }:${ port }/${ args[0] }`
+
+          console.log(url)
+
+          console.log(params)
 
           const req = (url: string) => new Promise(resolve => resolve(fetch(url, params)))
 

@@ -22,8 +22,14 @@ Vue.use(Docker, DockerOptions)
 Vue.use(Emitter)
 
 Vue.use(Http, {
-  host: process.env.VUE_APP_PROXY_HOST,
-  port: process.env.VUE_APP_PROXY_PORT
+  api: {
+    host: process.env.VUE_APP_API_HOST,
+    port: process.env.VUE_APP_API_PORT
+  },
+  proxy: {
+    host: process.env.VUE_APP_PROXY_HOST,
+    port: process.env.VUE_APP_PROXY_PORT
+  }
 })
 
 const app = new Vue({

@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  dnsmasq:
+    image: andyshinn/dnsmasq:2.75
+    command: ["dnsmasq", "-k", "-S", "/localhost/10.0.0.20"]
+    ports:
+      - 53:53
+    cap_add:
+      - NET_ADMIN
