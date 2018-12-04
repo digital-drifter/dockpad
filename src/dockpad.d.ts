@@ -42,7 +42,9 @@ export interface IDocker {
 }
 
 export interface IWebSocketClient {
-  emit (event: string, payload: any): void
+  emit (event: string, payload: any, cb?: (data: any) => void): void
 
   send (message: any, cb?: (data: any) => void): void
 }
+
+export type ContainerState = 'created' | 'restarting' | 'running' | 'paused' | 'exited' | 'dead'

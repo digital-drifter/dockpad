@@ -3,8 +3,8 @@
         <v-toolbar card>
             <v-toolbar-title class="title">Bitbucket</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn @click="$bitbucket.authenticate()" class="blue" raised v-if="!authenticated">Sign In</v-btn>
-            <v-btn @click="$bitbucket.refresh()" class="blue" raised v-else>Refresh Token</v-btn>
+            <v-btn @click="authenticate" :loading="authenticating" class="blue" raised v-if="!authenticated">Sign In</v-btn>
+            <v-btn @click="$bitbucket.refresh()" :loading="authenticating" class="blue" raised v-else>Refresh Token</v-btn>
         </v-toolbar>
         <v-card-text>
             <v-container fluid full-height grid-list-md>
@@ -32,6 +32,7 @@
                                       clearable
                                       label="Search Repositories"
                                       outline
+                                      :disabled="!teams.selected"
                                       v-model="search">
                         </v-text-field>
                     </v-flex>
@@ -157,6 +158,8 @@
 
     private loading: boolean = false
 
+    private authenticating: boolean = false
+
     private repositories: any = {}
 
     private search: string = ''
@@ -254,10 +257,16 @@
       this.loading = false
     }
 
+    private async authenticate (): Promise<any> {
+      this.authenticating = true
+      await this.$bitbucket.authenticate()
+      this.authenticating = false
+    }
+
     private clone (): void {
       const command: string = `git clone --progress --verbose https://x-token-auth:${ this.$bitbucket.accessToken }@bitbucket.org/${ this.repository.full_name }.git ${ this.repoDir }`
 
-      this.$ws.send(command, (data) => {
+      this.$ws.send(command, (data: any) => {
         this.stdout += data
       })
     }

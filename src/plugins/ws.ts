@@ -1,7 +1,17 @@
 import Vue, { VueConstructor } from 'vue'
 import io from 'socket.io-client'
+import { IWebSocketClient } from '@/dockpad'
 
-class WebSocketClient {
+const uuid = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: any) => {
+    let r = Math.random() * 16 | 0
+    let v = c === 'x' ? r : (r & 0x3 | 0x8)
+
+    return v.toString(16)
+  })
+}
+
+class WebSocketClient implements IWebSocketClient {
   conn: SocketIOClient.Socket
 
   callbacks: Map<string, ((data: any) => void)> = new Map()
@@ -21,24 +31,35 @@ class WebSocketClient {
       console.error('Connection error')
     })
 
-    this.conn.on('message', (e: any) => {
-      console.log(e)
+    this.conn.on('message', (payload: any) => {
+      if (this.callbacks.has(payload.id)) {
+        const callback = this.callbacks.get(payload.id)
 
-      this.callbacks.forEach((callback: ((data: any) => void)) => {
-        callback(e)
-      })
+        callback!.call(null, payload)
+
+        this.callbacks.delete(payload.id)
+      }
     })
   }
 
   send (message: any, cb?: (data: any) => void): void {
+    const id = uuid()
+
     if (cb) {
-      this.callbacks.set('test', cb)
+      this.callbacks.set(id, cb)
     }
-    this.conn.send(message)
+
+    this.conn.send({ id, message })
   }
 
-  emit (event: string, payload: any): void {
-    this.conn.emit(event, payload)
+  emit (event: string, commands: any[], cb?: (data: any) => void): void {
+    const id = uuid()
+
+    if (cb) {
+      this.callbacks.set(id, cb)
+    }
+
+    this.conn.emit(event, { id, commands })
   }
 }
 

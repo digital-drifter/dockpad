@@ -1,5 +1,6 @@
 import Vue, { CreateElement } from 'vue'
 import './plugins/vuetify'
+import './hooks'
 import Bitbucket from './plugins/bitbucket'
 import Docker from './plugins/docker'
 import Emitter from './plugins/emitter'

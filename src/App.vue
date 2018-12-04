@@ -2,7 +2,7 @@
     <v-app dark id="inspire">
         <v-navigation-drawer app clipped fixed v-model="drawer">
             <v-list dense avatar>
-                <v-list-tile @click="">
+                <v-list-tile :to="{ name: 'dashboard' }">
                     <v-list-tile-action>
                         <v-icon>dashboard</v-icon>
                     </v-list-tile-action>

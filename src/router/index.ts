@@ -14,6 +14,11 @@ const routes: RouteConfig[] = [
     }
   },
   {
+    name: 'dashboard',
+    path: '/dashboard',
+    component: () => import('../components/Dashboard.vue')
+  },
+  {
     name: 'services',
     path: '/services',
     component: () => import('../components/Services.vue')
